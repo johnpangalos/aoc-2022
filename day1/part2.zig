@@ -7,22 +7,21 @@ pub fn main() !void {
     var curr: i32 = 0;
 
     while (iter.next()) |line| {
-        if (line.len == 0) {
-            maxCheck: for (maxArr) |max, idx| {
-                if (curr > max) {
-                    if (idx != 2) {
-                        maxArr[idx + 1] = max;
-                    }
-                    maxArr[idx] = curr;
-                    break :maxCheck;
-                }
-            }
-
-            curr = 0;
+        if (line.len > 0) {
+            curr = curr + try std.fmt.parseInt(i32, line, 10);
             continue;
         }
 
-        curr = curr + try std.fmt.parseInt(i32, line, 10);
+        maxCheck: for (maxArr) |max, idx| {
+            if (curr > max) {
+                if (idx != 2) {
+                    maxArr[idx + 1] = max;
+                }
+                maxArr[idx] = curr;
+                break :maxCheck;
+            }
+        }
+        curr = 0;
     }
 
     var sum: i32 = 0;
