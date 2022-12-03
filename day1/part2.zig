@@ -12,13 +12,13 @@ pub fn main() !void {
             continue;
         }
 
-        maxCheck: for (maxArr) |max, idx| {
+        for (maxArr) |max, idx| {
             if (curr > max) {
                 if (idx != 2) {
                     maxArr[idx + 1] = max;
                 }
                 maxArr[idx] = curr;
-                break :maxCheck;
+                break;
             }
         }
         curr = 0;
