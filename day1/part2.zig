@@ -3,8 +3,9 @@ const input = @embedFile("./input.txt");
 
 pub fn main() !void {
     var iter = std.mem.split(u8, input, "\n");
-    var maxArr = [3]i32{ 0, 0, 0 };
     var curr: i32 = 0;
+    var list = std.ArrayList(i32).init(std.heap.page_allocator);
+    defer list.deinit();
 
     while (iter.next()) |line| {
         if (line.len > 0) {
@@ -12,22 +13,11 @@ pub fn main() !void {
             continue;
         }
 
-        for (maxArr) |max, idx| {
-            if (curr > max) {
-                if (idx != 2) {
-                    maxArr[idx + 1] = max;
-                }
-                maxArr[idx] = curr;
-                break;
-            }
-        }
+        try list.append(curr);
         curr = 0;
     }
 
-    var sum: i32 = 0;
-    for (maxArr) |max| {
-        sum = sum + max;
-    }
+    std.sort.sort(i32, list.items, {}, comptime std.sort.desc(i32));
 
-    std.debug.print("{d}\n", .{sum});
+    std.debug.print("{d}\n", .{list.items[0] + list.items[1] + list.items[2]});
 }
