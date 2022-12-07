@@ -19,25 +19,27 @@ pub fn main() !void {
     while (iter.next()) |line| {
         if (line.len == 0) break;
 
-        if (line[0] == oppRock and line[2] == mustLose) {
-            total = total + scissors;
-        } else if (line[0] == oppRock and line[2] == mustTie) {
-            total = total + tiePts + rock;
-        } else if (line[0] == oppRock and line[2] == mustWin) {
-            total = total + winPts + paper;
-        } else if (line[0] == oppPaper and line[2] == mustLose) {
-            total = total + rock;
-        } else if (line[0] == oppPaper and line[2] == mustTie) {
-            total = total + tiePts + paper;
-        } else if (line[0] == oppPaper and line[2] == mustWin) {
-            total = total + winPts + scissors;
-        } else if (line[0] == oppScissors and line[2] == mustLose) {
-            total = total + paper;
-        } else if (line[0] == oppScissors and line[2] == mustTie) {
-            total = total + tiePts + scissors;
-        } else if (line[0] == oppScissors and line[2] == mustWin) {
-            total = total + winPts + rock;
-        }
+        total += switch (line[0]) {
+            oppRock => switch (line[2]) {
+                mustLose => scissors,
+                mustTie => tiePts + rock,
+                mustWin => winPts + paper,
+                else => return error.Error,
+            },
+            oppPaper => switch (line[2]) {
+                mustLose => rock,
+                mustTie => tiePts + paper,
+                mustWin => winPts + scissors,
+                else => return error.Error,
+            },
+            oppScissors => switch (line[2]) {
+                mustLose => paper,
+                mustTie => tiePts + scissors,
+                mustWin => winPts + rock,
+                else => return error.Error,
+            },
+            else => return error.Error,
+        };
     }
 
     std.debug.print("{d}\n", .{total});

@@ -19,23 +19,23 @@ pub fn main() !void {
     while (iter.next()) |line| {
         if (line.len == 0) break;
 
-        total = switch (line[0]) {
+        total += switch (line[0]) {
             oppRock => switch (line[2]) {
-                usRock => total + tie + rock,
-                usPaper => total + win + paper,
-                usScissors => total + scissors,
+                usRock => tie + rock,
+                usPaper => win + paper,
+                usScissors => scissors,
                 else => return error.Error,
             },
             oppPaper => switch (line[2]) {
-                usRock => total + rock,
-                usPaper => total + tie + paper,
-                usScissors => total + win + scissors,
+                usRock => rock,
+                usPaper => tie + paper,
+                usScissors => win + scissors,
                 else => return error.Error,
             },
             oppScissors => switch (line[2]) {
-                usRock => total + win + rock,
-                usPaper => total + paper,
-                usScissors => total + tie + scissors,
+                usRock => win + rock,
+                usPaper => paper,
+                usScissors => tie + scissors,
                 else => return error.Error,
             },
             else => return error.Error,
