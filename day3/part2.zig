@@ -12,11 +12,11 @@ pub fn main() !void {
     while (iter.next()) |line| {
         if (line.len == 0) break;
 
-        var one = iter.next().?;
-        var two = iter.next().?;
+        var next = iter.next().?;
+        var twoAfter = iter.next().?;
 
         for (line) |char| {
-            if (mem.indexOfScalar(u8, one, char) != null and mem.indexOfScalar(u8, two, char) != null) {
+            if (mem.indexOfScalar(u8, next, char) != null and mem.indexOfScalar(u8, twoAfter, char) != null) {
                 total += mem.indexOfScalar(u8, itemVal, char).? + 1;
                 break;
             }
