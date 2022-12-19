@@ -1,3 +1,5 @@
+// TODO: Parse the input
+// https://adventofcode.com/2022/day/5
 const std = @import("std");
 const input = @embedFile("./input.txt");
 
