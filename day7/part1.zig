@@ -1,64 +1,45 @@
 const std = @import("std");
-const input = @embedFile("./test.txt");
-
-const Node = struct {
-    name: []const u8,
-    subDirs: std.ArrayList(*Node),
-    size: ?usize,
-    parent: ?*Node,
-    fn totalSize(self: *Node) usize {
-        var total = self.size;
-        for (self.subDirs.items) |node| {
-            if (node.*.size == null) {
-                total += node.*.size;
-                continue;
-            }
-            total += &node.totalSize();
-        }
-    }
-    fn deinit(self: *Node) !void {
-        for (self.subDirs.items) |node| {
-            if (node.*.size == null) continue;
-            node.*.deinit();
-        }
-        self.subDirs.deinit();
-    }
-};
+const input = @embedFile("./input.txt");
 
 pub fn main() !void {
     var iter = std.mem.tokenize(u8, input, "\n");
-    var currentDir: ?*Node = null;
-    var map = std.StringHashMap(Node).init(
+    var map = std.StringHashMap(usize).init(
         std.heap.page_allocator,
     );
-    map.deinit();
+    defer map.deinit();
+
+    var stack = std.ArrayList([]const u8).init(std.heap.page_allocator);
+    defer stack.deinit();
+
     while (iter.next()) |line| {
         if (std.mem.eql(u8, line, "$ ls")) continue;
         if (std.mem.eql(u8, line, "$ cd ..")) {
-            currentDir = currentDir.?.parent;
+            _ = stack.pop();
             continue;
         }
         if (std.mem.eql(u8, line[0..4], "$ cd")) {
-            var node = Node{
-                .parent = currentDir,
-                .name = line[5..],
-                .subDirs = std.ArrayList(*Node).init(std.heap.page_allocator),
-                .size = null,
-            };
-            currentDir = &node;
-            std.debug.print("{s}", .{node.name});
-            // try map.putNoClobber(node.name, node);
+            _ = try map.getOrPutValue(line[5..], 0);
+            try stack.append(line[5..]);
             continue;
         }
         if (std.mem.eql(u8, line[0..3], "dir")) {
-            var subDirs = std.ArrayList(*Node).init(std.heap.page_allocator);
-            try map.put(line[5..], .{
-                .parent = currentDir,
-                .name = line[5..],
-                .subDirs = subDirs,
-                .size = null,
-            });
-            // try currentDir.?.subDirs.append(&node);
+            _ = try map.getOrPutValue(line[4..], 0);
+            continue;
+        }
+        var temp = std.mem.tokenize(u8, line, " ");
+        var size = try std.fmt.parseInt(usize, temp.next().?, 10);
+
+        for (stack.items) |dir| {
+            var currentSize = map.get(dir) orelse 0;
+            try map.put(dir, currentSize + size);
         }
     }
+
+    var mapIter = map.iterator();
+    var total: usize = 0;
+    while (mapIter.next()) |node| {
+        if (node.value_ptr.* <= 100000) total += node.value_ptr.*;
+        std.debug.print("{s}, {d}\n", .{ node.key_ptr.*, node.value_ptr.* });
+    }
+    std.debug.print("{d}\n", .{total});
 }
